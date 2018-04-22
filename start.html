@@ -12,9 +12,21 @@
         <script src="js/three.js"></script>
         <!-- Einbinden der OrbitControls, um die Darstellung mit der Maus rotieren zu können. -->
         <script src="js/OrbitControls.js"></script>
-        <script>
-             // OrbitControls erzeugen, um mit der Maus beliebig rotieren zu können
-             // var controls = new THREE.OrbitControls(camera, renderer.domElement);
+				<script>
+
+					//function definition for rotation over world-axis
+    			function rotateAroundWorldAxis(object, axis, radians) {
+						rotWorldMatrix = new THREE.Matrix4(); 								 //declare matrix objet
+
+						//assign values for transformation matrix (derived from the radians traveled in rotation)
+						rotWorldMatrix.makeRotationAxis(axis.normalize(), radians); 
+						rotWorldMatrix.multiply(object.matrix);                //find value of new matrix
+
+						object.matrix = rotWorldMatrix; 											 //assign new matrix object;
+						object.rotation.setFromRotationMatrix(object.matrix);	 //apply rotation
+					} 
+
+					//*******************   Scene Creation   *******************
 					var scene = new THREE.Scene();
 
 					//initialize camera
@@ -27,39 +39,54 @@
 					var renderer = new THREE.WebGLRenderer( );
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
-					
+
+					//****************** 3D OBJECTS *******************					
 					//create cone
 					var geometry = new THREE.ConeGeometry(5, 20, 32, 1, false  );
 					var material = new THREE.MeshBasicMaterial( {color:0xadd8e6, transparent:true})	
 					material.opacity = 0.8;			//reduce opacity to see axes
 					var cone = new THREE.Mesh(geometry, material); 
-					cone.position.set(0,0,0);
-					cone.lookAt(new THREE.Vector3(2,3,-4));
+					cone.position.set(2,3,-4);
 					scene.add( cone );
-	
-					//create sphere
-					
-					//******************** cut cone with plane ***************************
-					var geometry = new THREE.PlaneGeometry( 6, .5, 6, 6 );
-					var material = new THREE.MeshBasicMaterial( {color: 0x8b0000, side: THREE.DoubleSide} );
-					var plane = new THREE.Mesh( geometry, material );
-	
 
-					scene.add( plane );
+										
+					//create box and cut cone
+					var geometry = new THREE.BoxGeometry( 6, .5, 6 );
+					var material = new THREE.MeshBasicMaterial( {color: 0x8b0000, side: THREE.DoubleSide} );
+					var box = new THREE.Mesh( geometry, material );
+					box.position.set(2,10, -4);//position box at the correct vector coordinate
+		
+					//rotate box
+					var yAxis = new THREE.Vector3(0, 1, 0);								//unit vector for rotation over y-axis
+					rotateAroundWorldAxis(box, yAxis, Math.sqrt(2)/2);		//call function to rotate the box
+					scene.add( box );
+
+
+					//create sphere	
+					var geometry = new THREE.SphereGeometry(1.5, 32, 32);
+					var material = new THREE.MeshBasicMaterial( {color: 0x800080});
+					var sphere = new THREE.Mesh(geometry, material);
+					sphere.position.set(2, 10, -4);
+					scene.add(sphere);
+
 					//***************************   show axes   ****************************
 					//x axis
 					var geometry = new THREE.Geometry();
+					//push end points of the line segment onto the stack
 					geometry.vertices.push(new THREE.Vector3(0,0,0));
 					geometry.vertices.push(new THREE.Vector3(20,0,0));
-					var material = new THREE.LineBasicMaterial({color:0xff0000})
+					//add color
+					var material = new THREE.LineBasicMaterial({color:0xff0000});
+					//make line object
 					var line = new THREE.Line(geometry, material);
+					//insert in scene
 					scene.add(line);
 
 					//y axis
 					var geometry = new THREE.Geometry();
 					geometry.vertices.push(new THREE.Vector3(0,0,0));
 					geometry.vertices.push(new THREE.Vector3(0,20,0));
-					var material = new THREE.LineBasicMaterial({color:0x008000})
+					var material = new THREE.LineBasicMaterial({color:0x008000});
 					line = new THREE.Line(geometry, material);
 					scene.add(line);
 					
@@ -67,18 +94,11 @@
 					var geometry = new THREE.Geometry();
 					geometry.vertices.push(new THREE.Vector3(0,0,0));
 					geometry.vertices.push(new THREE.Vector3(0,0,20));
-					var material = new THREE.LineBasicMaterial({color:0x0000FF})
+					var material = new THREE.LineBasicMaterial({color:0x0000FF});
 					line = new THREE.Line(geometry, material);
 					scene.add(line);
 					
-					var geometry = new THREE.Geometry();
-					geometry.vertices.push(new THREE.Vector3(0,0,0));
-					geometry.vertices.push(new THREE.Vector3(2,3,-4));
-					var material = new THREE.LineBasicMaterial({color:0x000000});
-					line = new THREE.Line(geometry, material);
-					scene.add(line);
-
-					
+					//render the world  
 					var animate = function () {
 						requestAnimationFrame( animate );
 
