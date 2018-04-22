@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>My first three.js app for CG1 (Exercise 2)</title>
+        <style>
+            body { margin: 0; background-color: #ffffff}
+            canvas { width: 100%; height: 100%; display: block; }
+        </style>
+    </head>
+    <body>
+        <script src="js/three.js"></script>
+        <!-- Einbinden der OrbitControls, um die Darstellung mit der Maus rotieren zu können. -->
+        <script src="js/OrbitControls.js"></script>
+        <script>
+             // OrbitControls erzeugen, um mit der Maus beliebig rotieren zu können
+             // var controls = new THREE.OrbitControls(camera, renderer.domElement);
+					var scene = new THREE.Scene();
+
+					//initialize camera
+					var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+					camera.position.set(10, 10, 20);  //Schaut vom Punk (10, 10, 20)
+					camera.lookAt( scene.position ); 					//Schaut auf den Punkt (0, 0, 0)
+
+				
+					//renderer	
+					var renderer = new THREE.WebGLRenderer( );
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					document.body.appendChild( renderer.domElement );
+					
+					//create cone
+					var geometry = new THREE.ConeGeometry(5, 20, 32, 1, false  );
+					var material = new THREE.MeshBasicMaterial( {color:0xadd8e6, transparent:true})	
+					material.opacity = 0.8;			//reduce opacity to see axes
+					var cone = new THREE.Mesh(geometry, material); 
+					cone.position.set(0,0,0);
+					cone.lookAt(new THREE.Vector3(2,3,-4));
+					scene.add( cone );
+	
+					//create sphere
+					
+					//******************** cut cone with plane ***************************
+					var geometry = new THREE.PlaneGeometry( 6, .5, 6, 6 );
+					var material = new THREE.MeshBasicMaterial( {color: 0x8b0000, side: THREE.DoubleSide} );
+					var plane = new THREE.Mesh( geometry, material );
+	
+
+					scene.add( plane );
+					//***************************   show axes   ****************************
+					//x axis
+					var geometry = new THREE.Geometry();
+					geometry.vertices.push(new THREE.Vector3(0,0,0));
+					geometry.vertices.push(new THREE.Vector3(20,0,0));
+					var material = new THREE.LineBasicMaterial({color:0xff0000})
+					var line = new THREE.Line(geometry, material);
+					scene.add(line);
+
+					//y axis
+					var geometry = new THREE.Geometry();
+					geometry.vertices.push(new THREE.Vector3(0,0,0));
+					geometry.vertices.push(new THREE.Vector3(0,20,0));
+					var material = new THREE.LineBasicMaterial({color:0x008000})
+					line = new THREE.Line(geometry, material);
+					scene.add(line);
+					
+					//zaxis
+					var geometry = new THREE.Geometry();
+					geometry.vertices.push(new THREE.Vector3(0,0,0));
+					geometry.vertices.push(new THREE.Vector3(0,0,20));
+					var material = new THREE.LineBasicMaterial({color:0x0000FF})
+					line = new THREE.Line(geometry, material);
+					scene.add(line);
+					
+					var geometry = new THREE.Geometry();
+					geometry.vertices.push(new THREE.Vector3(0,0,0));
+					geometry.vertices.push(new THREE.Vector3(2,3,-4));
+					var material = new THREE.LineBasicMaterial({color:0x000000});
+					line = new THREE.Line(geometry, material);
+					scene.add(line);
+
+					
+					var animate = function () {
+						requestAnimationFrame( animate );
+
+						renderer.render(scene, camera);
+					};
+			
+					animate();
+				
+				</script>
+    </body>
+</html>
